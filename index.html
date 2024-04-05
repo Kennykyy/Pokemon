@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
+    <link rel="icon" href="images (1).png" type="Logo">
+    
+    
+    <style>
+        
+         @font-face {
+            font-family: 'Pokemon';
+            src: url('C:\Users\brian\OneDrive\Escritorio\Avance_1') format('truetype'); 
+        }
+        body {
+         
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .flex {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .card-body {
+            padding: 10px;
+        }
+
+        .card-body-title {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        h1{
+            text-align: center;
+        }
+    </style>
+</head>
+<body background="images.jpeg">
+    <h1 class="title">Pokemones</h1>
+    <main class="flex"></main>
+
+    <template id="card">
+        <article class="card">
+            <img src="" alt="pokemon" />
+            <div class="card-body">
+                <h1 class="card-body-title">
+                    <span></span>
+                </h1>
+                <p class="card-body-text"></p>
+            </div>
+            <div class="card-footer">
+                <div class="card-footer-social">
+                    <h3></h3>
+                    <p>Ataque</p>
+                </div>
+                <div class="card-footer-social">
+                    <h3></h3>
+                    <p>Ataque Especial</p>
+                </div>
+                <div class="card-footer-social">
+                    <h3></h3>
+                    <p>Defensa</p>
+                </div>
+            </div>
+        </article>
+    </template>
+
+    <script>
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const flex = document.querySelector(".flex");
+
+            for (let i = 0; i < 12; i++) {
+                const randomId = getRandomInt(1, 152);
+                await fetchData(randomId, flex);
+            }
+        });
+
+        const fetchData = async (id, flex) => {
+            try {
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                const data = await res.json();
+
+                const pokemon = {
+                    img: data.sprites.front_default,
+                    nombre: data.name,
+                    experiencia: data.base_experience,
+                    ataque: data.stats[1].base_stat,
+                    especial: data.stats[3].base_stat,
+                    defensa: data.stats[2].base_stat,
+                };
+
+                pintarCard(pokemon, flex);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        const pintarCard = (pokemon, flex) => {
+            const template = document.getElementById("card").content;
+            const clone = template.cloneNode(true);
+
+            clone.querySelector("img").setAttribute("src", pokemon.img);
+            clone.querySelector(".card-body-title span").textContent = `${pokemon.nombre}`;
+            clone.querySelector(".card-body-text").textContent = `${pokemon.experiencia} exp`;
+            clone.querySelectorAll(".card-footer-social h3")[0].textContent = `${pokemon.ataque}K`;
+            clone.querySelectorAll(".card-footer-social h3")[1].textContent = `${pokemon.especial}K`;
+            clone.querySelectorAll(".card-footer-social h3")[2].textContent = `${pokemon.defensa}K`;
+
+            flex.appendChild(clone);
+        }
+    </script>
+</body>
+</html>
